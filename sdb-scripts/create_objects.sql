@@ -1,0 +1,96 @@
+CREATE OR REPLACE FUNCTION FNC_CFL_LOCKID(lockId IN VARCHAR2, lckMode IN NUMBER) RETURN NUMBER
+IS PRAGMA AUTONOMOUS_TRANSACTION;
+   lock_handle VARCHAR2(128);
+   res NUMBER;
+BEGIN
+   DBMS_LOCK.ALLOCATE_UNIQUE (lockId, lock_handle);
+   res := DBMS_LOCK.REQUEST(lockhandle=>lock_handle, lockmode=>lckMode, timeout=>0, release_on_commit=>FALSE);
+   IF res = 4 THEN
+      res := DBMS_LOCK.CONVERT(lockhandle=>lock_handle, lockmode=>lckMode, timeout=>0);
+   END IF;
+   RETURN res;
+END FNC_CFL_LOCKID;
+
+CREATE OR REPLACE FUNCTION FNC_SDB_UNLOCKID(lockId IN VARCHAR2) RETURN NUMBER
+IS PRAGMA AUTONOMOUS_TRANSACTION;
+   lock_handle VARCHAR2(128);
+BEGIN
+   DBMS_LOCK.ALLOCATE_UNIQUE (lockId, lock_handle);
+   RETURN DBMS_LOCK.RELEASE(lockhandle=>lock_handle);
+END FNC_SDB_UNLOCKID;
+
+CREATE TABLE SDB_TABLES(CLP_TAB_NAME VARCHAR2(30) NOT NULL,
+                        DB_TAB_NAME VARCHAR2(30) NOT NULL,
+                        HINT VARCHAR2(150),
+                        NEXT_RECNO NUMBER(10) DEFAULT 1 NOT NULL,
+                        RECNO_CACHE_SIZE NUMBER(4) DEFAULT 20 NOT NULL,
+                        BUFFER_LENGTH NUMBER(5) DEFAULT 0 NOT NULL,
+                        CONSTRAINT SDB_TABLES_PK PRIMARY KEY (CLP_TAB_NAME)) INITRANS 100;
+
+CREATE TABLE SDB_TABLES_COLUMNS(CLP_TAB_NAME VARCHAR2(30) NOT NULL,
+	                            CLP_COL_NAME VARCHAR2(30) NOT NULL,
+	                            DB_COL_NAME VARCHAR2(30) NOT NULL,
+	                            COL_TYPE NUMBER(1) NOT NULL,
+	                            CLP_DATA_TYPE CHAR(1) NOT NULL,
+	                            CLP_DATA_LEN NUMBER(5),
+	                            CLP_DATA_DEC NUMBER(2),
+	                            CLP_INDEX_NAME VARCHAR2(30),
+	                            DB_INDEX_NAME VARCHAR2(30),
+	                            CLP_EXPRESSION VARCHAR2(250),
+	                            DB_EXPRESSION  VARCHAR2(250),
+                               SET_MODE NUMBER(3) DEFAULT 0,
+	                            HINT VARCHAR2(150),
+	                            COL_ORDER NUMBER(5),
+	                            CONSTRAINT SDB_TABLES_COLUMNS_PK PRIMARY KEY (CLP_TAB_NAME, CLP_COL_NAME))
+
+CREATE SEQUENCE SEQ_SDB_RECNO INCREMENT BY 1 START WITH 1 CACHE 10;
+
+CREATE OR REPLACE FUNCTION FNC_SDB_NEXTRECNOCACHE(pi_Schema IN VARCHAR2, pi_tableName IN VARCHAR2, pi_cacheSize IN NUMBER) RETURN NUMBER 
+IS PRAGMA AUTONOMOUS_TRANSACTION;
+   VS_NEXTRECNO NUMBER(10);
+BEGIN
+   EXECUTE IMMEDIATE 'UPDATE ' || pi_Schema || '.SDB_TABLES
+                         SET NEXT_RECNO = NEXT_RECNO + :1
+                       WHERE CLP_TAB_NAME=:2 RETURNING NEXT_RECNO INTO :3'
+               USING pi_cacheSize, pi_tableName
+      RETURNING INTO vs_nextRecno;
+   COMMIT;
+   RETURN VS_NEXTRECNO;
+END FNC_SDB_NEXTRECNOCACHE;
+
+CREATE OR REPLACE PROCEDURE PRC_SDB_UPDATENEXTRECNO(pi_recnoName IN VARCHAR2, pi_Schema IN VARCHAR2, pi_clpTabName IN VARCHAR2, pi_dbTabName IN VARCHAR2) 
+IS PRAGMA AUTONOMOUS_TRANSACTION;
+   VS_NEXTRECNO NUMBER(10);
+BEGIN
+   EXECUTE IMMEDIATE 'SELECT MAX(' || pi_recnoName || ') FROM ' || pi_Schema || '.' || pi_dbTabName INTO VS_NEXTRECNO;
+   EXECUTE IMMEDIATE 'UPDATE ' || pi_Schema || '.SDB_TABLES SET NEXT_RECNO = :1 + 1
+                       WHERE CLP_TAB_NAME=:2'
+               USING VS_NEXTRECNO, pi_clpTabName;
+   COMMIT;
+END PRC_SDB_UPDATENEXTRECNO;
+
+CREATE OR REPLACE FUNCTION FNC_SDB_TABLEISLOCKED(pi_schema IN VARCHAR2, pi_table IN VARCHAR2, pi_keys IN VARCHAR2, PI_MODE IN NUMBER) RETURN BOOLEAN
+IS
+   PRAGMA AUTONOMOUS_TRANSACTION;
+   RESOURCE_BUSY EXCEPTION;
+   PRAGMA EXCEPTION_INIT(RESOURCE_BUSY, -54);
+   vs_locked BOOLEAN;
+BEGIN
+   BEGIN
+      IF PI_MODE = 0 THEN
+  	     EXECUTE IMMEDIATE 'LOCK TABLE ' || pi_schema || '.' || pi_table || ' IN EXCLUSIVE MODE NOWAIT';
+      ELSIF PI_MODE = 1 THEN
+  	     EXECUTE IMMEDIATE 'LOCK TABLE ' || pi_schema || '.' || pi_table || ' PARTITION FOR ('|| pi_keys || ') IN EXCLUSIVE MODE NOWAIT';
+      ELSE
+  	     EXECUTE IMMEDIATE 'LOCK TABLE ' || pi_schema || '.' || pi_table || ' SUBPARTITION FOR ('|| pi_keys || ') IN EXCLUSIVE MODE NOWAIT';
+      END IF;
+      vs_locked := FALSE;
+   EXCEPTION
+      WHEN RESOURCE_BUSY THEN
+  	     vs_locked := TRUE;
+      WHEN OTHERS THEN
+  	     vs_locked := FALSE;
+   END;
+   COMMIT;
+   RETURN vs_locked;
+END FNC_SDB_TABLEISLOCKED;

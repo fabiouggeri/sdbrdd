@@ -1,0 +1,681 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <groupId>org.sdb</groupId>
+   <artifactId>sdb-superpom</artifactId>
+   <version>1.5.0.1</version>
+   <packaging>pom</packaging>
+
+   <name>SDBRDD - RDD for SQL Databases</name>
+
+   <modules>
+      <module>sdb-rdd-headers</module>
+      <module>sdb-ora-headers</module>
+      <module>sdb-rdd-lib</module>
+      <module>sdb-ora-lib</module>
+   </modules>
+
+   <properties>
+      <mainSource>main.prg</mainSource>
+
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <build-plugin-group-id>org.uggeri.maven.builder</build-plugin-group-id>
+      <build-plugin-artifact-id>builder-maven-plugin</build-plugin-artifact-id>
+      <build-plugin-version>2.4.1.0</build-plugin-version>
+
+      <hb-gt-libs>${lpref}gtstd.${lext};${lpref}gtwin.${lext}</hb-gt-libs>
+
+      <os>win</os>
+      <arch>64</arch>
+      <target-platform>${os}${arch}</target-platform>
+      <cc-target>${c-compiler}${cc-major-version}</cc-target>
+      <c-classifier>${target-platform}-${cc-target}</c-classifier>
+      <prg-classifier>${c-classifier}-${clp-compiler}${clp-major-version}</prg-classifier>
+      <debug-lib></debug-lib>
+      <extractDir>${user.home}\mvn-build</extractDir>
+      <tools-path>${extractDir}</tools-path>
+      <clp-path>${tools-path}\${clp-group-id}\${clp-artifact-id}\${clp-version}\${c-classifier}</clp-path>
+      <cc-path>${tools-path}\${cc-group-id}\${cc-artifact-id}\${cc-version}\${target-platform}</cc-path>
+      <lpref></lpref>
+      <lext>lib</lext>
+      <oext>obj</oext>
+      <path-sep></path-sep>
+      <jvm-libs-path></jvm-libs-path>
+
+      <cfl-version>1.9.0.1</cfl-version>
+      <yapp-version>1.0.4</yapp-version>
+      <oci-version>21.9.0.0</oci-version>
+
+      <xhb-id>xhb</xhb-id>
+      <xhb-version>0.99.5.19</xhb-version>
+      <xhb-major-version>0.99.x</xhb-major-version>
+      <xhb-group-id>org.xharbour</xhb-group-id>
+      <xhb-artifact-id>xharbour-app</xhb-artifact-id>
+      <xhb-lib-debug>${lpref}debug.${lext}</xhb-lib-debug>
+      <xhb-includes-path>${clp-path}\include</xhb-includes-path>
+      <xhb-libs-path>${clp-path}\lib</xhb-libs-path>
+      <xhb-libs>${lpref}optcon.${lext};${lpref}vm.${lext};${lpref}rtl.${lext};${hb-gt-libs};${lpref}rdd.${lext};${lpref}macro.${lext};${lpref}pp.${lext};${lpref}dbfntx.${lext};${lpref}dbfcdx.${lext};${lpref}common.${lext};${lpref}dbfdbt.${lext};${lpref}lang.${lext};${lpref}hbzipmt.${lext};${lpref}dbffpt.${lext};${lpref}ct.${lext};${lpref}tip.${lext};${lpref}hbhpdf.${lext};${debug-lib}</xhb-libs>
+      <xhb-cmd>harbour.exe "#{inputFile}" -m -n -w -gc2 #{?ppo='true', '-p'} #{?debug='true', '-b'} #{?suppressLines='true', '-l'} #{defines, '-D', ' -D', '='} #{includesPaths, '-i', ' -i'} -o"#{outputFile}"</xhb-cmd>
+
+      <hb-id>hb</hb-id>
+      <hb-version>3.2.0.43</hb-version>
+      <hb-major-version>3.2.x</hb-major-version>
+      <hb-group-id>org.harbour</hb-group-id>
+      <hb-artifact-id>harbour-app</hb-artifact-id>
+      <hb-lib-debug>${lpref}hbdebug.${lext}</hb-lib-debug>
+      <hb-includes-path>${clp-path}\include;${clp-path}\include\xhb</hb-includes-path>
+      <hb-libs-path>${clp-path}\lib</hb-libs-path>
+      <hb-libs>${lpref}hbvmmt.${lext};${lpref}hbrtl.${lext};${hb-gt-libs};${lpref}hbrdd.${lext};${lpref}hbmacro.${lext};${lpref}hbpp.${lext};${lpref}rddntx.${lext};${lpref}rddcdx.${lext};${lpref}hbcommon.${lext};${lpref}hblang.${lext};${lpref}hbmzip.${lext};${lpref}hbziparc.${lext};${lpref}hbzlib.${lext};${lpref}rddfpt.${lext};${lpref}hbsix.${lext};${lpref}hbpcre.${lext};${lpref}minizip.${lext};${lpref}hbcpage.${lext};${lpref}xhb.${lext};${lpref}hbct.${lext};${lpref}hbhpdf.${lext};${lpref}hbtip.${lext};${debug-lib}</hb-libs>
+      <hb-cmd>harbour "#{inputFile}" -m -n -w -gc3 #{?ppo='true', '-p"${outputDirectory}"'} #{?debug='true', '-b'} #{?suppressLines='true', '-l'} #{defines, '-D', ' -D', '='} #{includesPaths, '-i"', '" -i"', '"'} -o"#{outputFile}"</hb-cmd>
+      <hb-linux-cmd>harbour #{inputFile} -m -n -w -gc3 #{?ppo='true', '-p${outputDirectory}'} #{?debug='true', '-b'} #{?suppressLines='true', '-l'} #{defines, '-D', ' -D', '='} #{includesPaths, '-i', ' -i'} -o#{outputFile}</hb-linux-cmd>
+
+      <bcc-id>bcc</bcc-id>
+      <bcc-version>5.6.0.1</bcc-version>
+      <bcc-major-version>5.x</bcc-major-version>
+      <bcc-group-id>com.borland.bcc</bcc-group-id>
+      <bcc-artifact-id>bcc-app</bcc-artifact-id>
+      <bcc-includes-path>${cc-path}\include</bcc-includes-path>
+      <bcc-libs-path>${cc-path}\lib;${cc-path}\lib\psdk</bcc-libs-path>
+      <bcc-libs>c0x32.obj;import32.lib;cw32mt.lib;ws2_32.lib</bcc-libs>
+      <bcc-cmd>bcc32.exe -y -VM -O2 -c -d -g0 -5 -6 -a8 -tWM #{?verbose='true', '-q'} -D__FUNCTION__=__FILE__ #{includesPaths, '-I"', '";"', '"'} #{defines, '-D', ' -D', '='} -o"#{outputFile}" "#{inputFile}"</bcc-cmd>
+      <bcc-link-options>-v -ap -Tpe -L"${cc-path}\lib" #{?verbose='true', '-r'} #{inputFiles, '"', '" "', '"'}, "#{outputFile}",, #{inputLibraries, '"', '" "', '"'}</bcc-link-options>
+      <bcc-link-cmd>ilink32.exe @${project.basedir}\target\classes\${prg-classifier}\lnk_options.rsp</bcc-link-cmd>
+      <bcc-lib-cmd>tlib.exe "#{outputFile}" #{inputFiles, '+"', '" +"', '"'}</bcc-lib-cmd>
+
+      <msc-id>msc</msc-id>
+      <msc-version>16.0.0.2</msc-version>
+      <msc-major-version>16.x</msc-major-version>
+      <msc-group-id>com.microsoft.msc</msc-group-id>
+      <msc-artifact-id>msc-app</msc-artifact-id>
+      <msc-includes-path>${cc-path}\include;${cc-path}\include\um;${cc-path}\include\msclr</msc-includes-path>
+      <msc-libs-path>${cc-path}\lib;${cc-path}\lib\sdk</msc-libs-path>
+      <msc-libs>shell32.lib;user32.lib;kernel32.lib;advapi32.lib;winspool.lib;ole32.lib;oleaut32.lib;ws2_32.lib;libcmt.lib;gdi32.lib;comdlg32.lib;msvcrt.lib;oldnames.lib;iphlpapi.lib</msc-libs>
+      <msc-cmd>cl.exe /c #{?debugC='true', '/Z7 /Od /MT'} #{!debugC, '/GA /Gs /Gd /arch:AVX /O2 /MT'} /W3 #{?mode='cpp', '/TP'} #{!mode, '/TC'} #{includesPaths, '/I"', '" /I"', '"'} /D_CRT_SECURE_NO_WARNINGS #{defines, '/D', ' /D', '='} /Fo"#{outputFile}" "#{inputFile}"</msc-cmd>
+      <msc-link-options>#{?debugC='true', '/DEBUG'} /IGNORE:4006,4078,4088 /INCREMENTAL:no /NODEFAULTLIB /SUBSYSTEM:CONSOLE /FORCE:MULTIPLE /OUT:"#{outputFile}" #{inputFiles, '"', '" "', '"'} #{inputLibraries, '"', '" "', '"'}</msc-link-options>
+      <msc-link-cmd>link.exe @"${project.basedir}\target\classes\${prg-classifier}\lnk_options.rsp"</msc-link-cmd>
+      <msc-lib-cmd>lib.exe /SUBSYSTEM:CONSOLE /OUT:"#{outputFile}" #{inputFiles, '"', '" "', '"'}</msc-lib-cmd>
+
+      <mingw64-id>mingw64</mingw64-id>
+      <mingw64-version>12.0.0.0</mingw64-version>
+      <mingw64-major-version>12.x</mingw64-major-version>
+      <mingw64-group-id>org.mingw64</mingw64-group-id>
+      <mingw64-artifact-id>mingw64-app</mingw64-artifact-id>
+      <mingw64-includes-path></mingw64-includes-path>
+      <mingw64-libs-path></mingw64-libs-path>
+      <mingw64-libs></mingw64-libs>
+      <mingw64-cmd>gcc #{?debugC='true', '-g'} #{!debugC, '-Ofast'} #{?sanitize='true', '-fsanitize=undefined -fsanitize=leak -fsanitize=thread -fsanitize=address -fsanitize=alignment'} -pipe -c -Wdiscarded-qualifiers #{includesPaths, '-I"', '" -I"', '"'} -I"${clp-includes-path}" #{defines, '-D', ' -D', '='} -D_WIN32_WINNT=0x0601 -o"#{outputFile}" "#{inputFile}"</mingw64-cmd>
+      <mingw64-link-options></mingw64-link-options>
+      <mingw64-link-cmd>gcc #{inputFiles, '"', '" "', '"'} #{?debugC='true', '-g'} #{!debugC, '-Ofast'} #{?sanitize='true', '-fsanitize=undefined -fsanitize=leak -fsanitize=thread -fsanitize=address -fsanitize=alignment'} -Wdiscarded-qualifiers -mconsole -Wl,--error-unresolved-symbols -Wl,--major-image-version=#{version} -Wl,--start-group #{inputLibraries, '-l"$(name,"lib")"', ' -l"$(name,"lib")"'} -lkernel32 -luser32 -lgdi32 -ladvapi32 -lws2_32 -liphlpapi -lwinspool -lcomctl32 -lcomdlg32 -lshell32 -luuid -lole32 -loleaut32 -lmpr -lwinmm -lmapi32 -limm32 -lmsimg32 -lwininet -Wl,--end-group -o#{outputFile} #{librariesPaths, '-L', ' -L'}</mingw64-link-cmd>
+      <mingw64-lib-cmd>ar rcs "#{outputFile}" #{inputFiles, '"', '" "', '"'}</mingw64-lib-cmd>
+
+      <clang-id>clang</clang-id>
+      <clang-version>16.0.2.0</clang-version>
+      <clang-major-version>16.x</clang-major-version>
+      <clang-group-id>org.llvm</clang-group-id>
+      <clang-artifact-id>clang-app</clang-artifact-id>
+      <clang-includes-path></clang-includes-path>
+      <clang-libs-path></clang-libs-path>
+      <clang-libs></clang-libs>
+      <clang-cmd>clang #{?debugC='true', '-Og -g3 -lSegFault'} #{!debugC, '-Ofast'} -pthread -Wall -ffunction-sections -fdata-sections #{includesPaths, '-I"', '" -I"', '"'} -I"${clp-includes-path}" #{defines, '-D', ' -D', '='} -o"#{outputFile}" -c "#{inputFile}"</clang-cmd>
+      <clang-link-options>#{inputFiles, '"', '" "', '"'} #{?debugC='true', '-Og -g3 -lSegFault'} #{!debugC, '-Ofast -Wl,-s -Wl,-S'} -static -pthread -Wl,--subsystem,console -Wl,-O -Wl,--nxcompat -Wl,--dynamicbase -Wl,--allow-multiple-definition -Wl,-s -Wl,-S -Wl,--gc-sections -Wl,--error-unresolved-symbols -Wl,--start-group #{inputLibraries, '-l"$(name,"lib")"', ' -l"$(name,"lib")"'} -lkernel32 -luser32 -lgdi32 -ladvapi32 -lws2_32 -liphlpapi -lshell32 -lwinspool -lmsimg32 -lcomctl32 -lcomdlg32 -luuid -lole32 -loleaut32 -lmpr -lwinmm -lmapi32 -limm32 -lwininet -lstdc++ -Wl,--end-group -o#{outputFile} #{librariesPaths, '-L', ' -L'}</clang-link-options>
+      <clang-link-cmd>clang @"${project.basedir}\target\classes\${prg-classifier}\lnk_options.rsp"</clang-link-cmd>
+      <clang-lib-cmd>ar rcs "#{outputFile}" #{inputFiles, '"', '" "', '"'}</clang-lib-cmd>
+
+      <gcc-id>gcc</gcc-id>
+      <gcc-version>11.3.0.0</gcc-version>
+      <gcc-major-version>11.x</gcc-major-version>
+      <gcc-group-id>org.gcc</gcc-group-id>
+      <gcc-artifact-id>gcc-app</gcc-artifact-id>
+      <gcc-includes-path></gcc-includes-path>
+      <gcc-libs-path></gcc-libs-path>
+      <gcc-libs></gcc-libs>
+      <gcc-cmd>gcc -pipe #{?debugC='true', '-Og -g3'} #{!debugC, '-Ofast'} -c -Wdiscarded-qualifiers #{includesPaths, '-I', ' -I'} #{defines, '-D', ' -D', '='} -o#{outputFile} #{inputFile}</gcc-cmd>
+      <gcc-link-options></gcc-link-options>
+      <gcc-link-cmd>gcc #{?debugC='true', '-Og -g3 -lSegFault'} #{!debugC, '-Ofast -Wl,-s -Wl,-S'} #{inputFiles, ' ', ' ', ' '} -Wdiscarded-qualifiers -Wl,--error-unresolved-symbols -Wl,--start-group #{inputLibraries, '-l$(name,"lib")', ' -l$(name,"lib")'} -Wl,--end-group -o#{outputFile} #{librariesPaths, '-L', ' -L'}</gcc-link-cmd>
+      <gcc-lib-cmd>ar rcs #{outputFile} #{inputFiles, ' ', ' ', ' '}</gcc-lib-cmd>
+
+      <clp-compiler>${hb-id}</clp-compiler>
+      <clp-version>${hb-version}</clp-version>
+      <clp-major-version>${hb-major-version}</clp-major-version>
+      <clp-group-id>${hb-group-id}</clp-group-id>
+      <clp-artifact-id>${hb-artifact-id}</clp-artifact-id>
+      <clp-lib-debug>${hb-lib-debug}</clp-lib-debug>
+      <clp-includes-path>${hb-includes-path}</clp-includes-path>
+      <clp-libs-path>${hb-libs-path}</clp-libs-path>
+      <clp-libs>${hb-libs}</clp-libs>
+      <clp-cmd>${hb-cmd}</clp-cmd>
+
+      <c-compiler>${msc-id}</c-compiler>
+      <cc-version>${msc-version}</cc-version>
+      <cc-major-version>${msc-major-version}</cc-major-version>
+      <cc-group-id>${msc-group-id}</cc-group-id>
+      <cc-artifact-id>${msc-artifact-id}</cc-artifact-id>
+      <cc-includes-path>${msc-includes-path}</cc-includes-path>
+      <cc-libs-path>${msc-libs-path}</cc-libs-path>
+      <cc-libs>${msc-libs}</cc-libs>
+      <cc-cmd>${msc-cmd}</cc-cmd>
+      <link-options>${msc-link-options}</link-options>
+      <link-cmd>${msc-link-cmd}</link-cmd>
+      <lib-cmd>${msc-lib-cmd}</lib-cmd>
+   </properties>
+
+   <dependencies>
+      <dependency>
+         <groupId>${clp-group-id}</groupId>
+         <artifactId>${clp-artifact-id}</artifactId>
+         <type>zip</type>
+         <version>${clp-version}</version>
+         <classifier>${c-classifier}</classifier>
+      </dependency>
+   </dependencies>
+
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>${build-plugin-group-id}</groupId>
+            <artifactId>${build-plugin-artifact-id}</artifactId>
+            <version>${build-plugin-version}</version>
+            <extensions>true</extensions>
+
+            <configuration>
+               <directory>${project.basedir}\target</directory>
+               <outputDirectory>${project.basedir}\target\classes\${prg-classifier}</outputDirectory>
+               <testOutputDirectory>${project.basedir}\target\test-classes\${prg-classifier}</testOutputDirectory>
+               <sourceDirectory>${project.basedir}\src\main</sourceDirectory>
+               <testSourceDirectory>${project.basedir}\src\test</testSourceDirectory>
+               <extractionDirectory>${extractDir}</extractionDirectory>
+               <pathSeparator>${path-sep}</pathSeparator>
+
+               <envVars>
+                  <PATH>${clp-path}\bin;${cc-path}\bin;${env.PATH}</PATH>
+                  <INCLUDE>${clp-path}\include;${cc-path}\include</INCLUDE>
+                  <LIB>${clp-path}\lib;${cc-path}\lib;${jvm-libs-path}</LIB>
+                  <LIBPATH>${clp-path}\lib;${cc-path}\lib;${jvm-libs-path}</LIBPATH>
+               </envVars>
+
+               <classifier>${prg-classifier}</classifier>
+
+               <conditionalDefines>
+                  <conditionalDefine>
+                     <properties>
+                        <os>win</os>
+                     </properties>
+                     <define>_SDB_OS_WIN_</define>
+                  </conditionalDefine>
+                  <conditionalDefine>
+                     <properties>
+                        <os>linux</os>
+                     </properties>
+                     <define>_SDB_OS_LINUX_</define>
+                  </conditionalDefine>
+                  <conditionalDefine>
+                     <properties>
+                        <c-compiler>msc</c-compiler>
+                     </properties>
+                     <define>_SDB_CC_MSC_</define>
+                  </conditionalDefine>
+                  <conditionalDefine>
+                     <properties>
+                        <c-compiler>mingw64</c-compiler>
+                     </properties>
+                     <define>_SDB_CC_MINGW64_</define>
+                  </conditionalDefine>
+                  <conditionalDefine>
+                     <properties>
+                        <c-compiler>clang</c-compiler>
+                     </properties>
+                     <define>_SDB_CC_CLANG_</define>
+                  </conditionalDefine>
+                  <conditionalDefine>
+                     <properties>
+                        <c-compiler>bcc</c-compiler>
+                     </properties>
+                     <define>_SDB_CC_BCC_</define>
+                  </conditionalDefine>
+                  <conditionalDefine>
+                     <properties>
+                        <c-compiler>bcc</c-compiler>
+                     </properties>
+                     <define>_SDB_LIGHT_LOCK</define>
+                  </conditionalDefine>
+                  <conditionalDefine>
+                     <properties>
+                        <clp-compiler>hb</clp-compiler>
+                     </properties>
+                     <define>_SDB_CLP_HB_</define>
+                  </conditionalDefine>
+                  <conditionalDefine>
+                     <properties>
+                        <clp-compiler>hb</clp-compiler>
+                     </properties>
+                     <define>__HBR__</define>
+                  </conditionalDefine>
+                  <conditionalDefine>
+                     <properties>
+                        <clp-compiler>xhb</clp-compiler>
+                     </properties>
+                     <define>__XHB__</define>
+                  </conditionalDefine>
+                  <conditionalDefine>
+                     <properties>
+                        <clp-compiler>xhb</clp-compiler>
+                     </properties>
+                     <define>_SDB_CLP_XHB_</define>
+                  </conditionalDefine>
+                  <conditionalDefine>
+                     <properties>
+                        <clp-compiler>xhb</clp-compiler>
+                     </properties>
+                     <define>HB_OS_WIN_32</define>
+                  </conditionalDefine>
+               </conditionalDefines>
+
+               <defines>
+                  <__ARCH__>${arch-target}</__ARCH__>
+                  <_SDB_VERSION_>${project.version}</_SDB_VERSION_>
+               </defines>
+
+               <includesPaths>${clp-includes-path};${cc-includes-path}</includesPaths>
+               <librariesPaths>${clp-libs-path};${cc-libs-path}</librariesPaths>
+               <libraries>${clp-libs};${cc-libs}</libraries>
+
+               <toolsMapping>
+                  <!-- Configuracao da ferramenta para compilacao dos fontes PRG -->
+                  <toolMapping>
+                     <tool>
+                        <groupId>${build-plugin-group-id}</groupId>
+                        <artifactId>builder-custom</artifactId>
+                        <version>${build-plugin-version}</version>
+                        <scope>runtime</scope>
+                        <toolClass>org.uggeri.build.tools.custom.compiler.CustomCompiler</toolClass>
+                     </tool>
+
+                     <toolConfig>
+                        <outputType>c</outputType>
+                        <sourceTypes>
+                           <type>prg</type>
+                        </sourceTypes>
+                        <includeTypes>
+                           <type>ch</type>
+                        </includeTypes>
+                        <commandLine>${clp-cmd}</commandLine>
+                     </toolConfig>
+                  </toolMapping>
+
+                  <!-- Configuracao da ferramenta para compilacao dos fontes em C e CPP-->
+                  <toolMapping>
+                     <tool>
+                        <groupId>${build-plugin-group-id}</groupId>
+                        <artifactId>builder-custom</artifactId>
+                        <version>${build-plugin-version}</version>
+                        <scope>runtime</scope>
+                        <toolClass>org.uggeri.build.tools.custom.compiler.CustomCompiler</toolClass>
+                     </tool>
+
+                     <toolConfig>
+                        <outputType>obj</outputType>
+                        <sourceTypes>
+                           <type>c</type>
+                           <type>cpp</type>
+                        </sourceTypes>
+                        <includeTypes>
+                           <type>h</type>
+                           <type>hpp</type>
+                        </includeTypes>
+                        <commandLine>${cc-cmd}</commandLine>
+                     </toolConfig>
+                  </toolMapping>
+
+                  <!-- Configuracao da ferramenta para geracao (linker) de executaveis  -->
+                  <toolMapping>
+                     <tool>
+                        <groupId>${build-plugin-group-id}</groupId>
+                        <artifactId>builder-custom</artifactId>
+                        <version>${build-plugin-version}</version>
+                        <scope>runtime</scope>
+                        <toolClass>org.uggeri.build.tools.custom.packer.CustomPacker</toolClass>
+                     </tool>
+
+                     <toolConfig>
+                        <outputType>exe</outputType>
+                        <sourceTypes>
+                           <type>obj</type>
+                        </sourceTypes>
+                        <packagingTypes>
+                           <type>exe</type>
+                        </packagingTypes>
+                        <commandLine>${link-cmd}</commandLine>
+                        <optionsFile>
+                           <pathName>${project.basedir}\target\classes\${prg-classifier}/lnk_options.rsp</pathName>
+                           <content>${link-options}</content>
+                        </optionsFile>
+                     </toolConfig>
+                  </toolMapping>
+
+                  <!-- Configuracao da ferramenta para geracao (archiver) de bibliotecas  -->
+                  <toolMapping>
+                     <tool>
+                        <groupId>${build-plugin-group-id}</groupId>
+                        <artifactId>builder-custom</artifactId>
+                        <version>${build-plugin-version}</version>
+                        <scope>runtime</scope>
+                        <toolClass>org.uggeri.build.tools.custom.packer.CustomPacker</toolClass>
+                     </tool>
+
+                     <toolConfig>
+                        <outputType>lib</outputType>
+                        <sourceTypes>
+                           <type>obj</type>
+                        </sourceTypes>
+                        <packagingTypes>
+                           <type>lib</type>
+                        </packagingTypes>
+                        <commandLine>${lib-cmd}</commandLine>
+                     </toolConfig>
+                  </toolMapping>
+               </toolsMapping>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-install-plugin</artifactId>
+            <version>2.2</version>
+            <configuration>
+               <createChecksum>true</createChecksum>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
+            <inherited>false</inherited>
+            <executions>
+               <execution>
+                  <id>clean-distribution</id>
+                  <phase>clean</phase>
+                  <goals>
+                     <goal>run</goal>
+                  </goals>
+                  <configuration>
+                     <target name="Clean Distribution">
+                        <delete dir="distribution/${project.version}" includeemptydirs="true" />
+                     </target>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
+
+   <profiles>
+      <profile>
+         <id>xharbour</id>
+
+         <activation>
+            <property>
+               <name>clp</name>
+               <value>xharbour</value>
+            </property>
+         </activation>
+         <properties>
+            <arch>32</arch>
+            <clp-compiler>${xhb-id}</clp-compiler>
+            <clp-version>${xhb-version}</clp-version>
+            <clp-major-version>${xhb-major-version}</clp-major-version>
+            <clp-group-id>${xhb-group-id}</clp-group-id>
+            <clp-artifact-id>${xhb-artifact-id}</clp-artifact-id>
+            <clp-lib-debug>${xhb-lib-debug}</clp-lib-debug>
+            <clp-includes-path>${xhb-includes-path}</clp-includes-path>
+            <clp-libs-path>${xhb-libs-path}</clp-libs-path>
+            <clp-libs>${xhb-libs}</clp-libs>
+            <clp-cmd>${xhb-cmd}</clp-cmd>
+
+            <c-compiler>${bcc-id}</c-compiler>
+            <cc-version>${bcc-version}</cc-version>
+            <cc-major-version>${bcc-major-version}</cc-major-version>
+            <cc-group-id>${bcc-group-id}</cc-group-id>
+            <cc-artifact-id>${bcc-artifact-id}</cc-artifact-id>
+            <cc-includes-path>${bcc-includes-path}</cc-includes-path>
+            <cc-libs-path>${bcc-libs-path}</cc-libs-path>
+            <cc-libs>${bcc-libs}</cc-libs>
+            <cc-cmd>${bcc-cmd}</cc-cmd>
+            <link-options>${bcc-link-options}</link-options>
+            <link-cmd>${bcc-link-cmd}</link-cmd>
+            <lib-cmd>${bcc-lib-cmd}</lib-cmd>
+            <hb-gt-libs>${lpref}gtnul.${lext};${lpref}gtstd.${lext};${lpref}gtwin.${lext}</hb-gt-libs>
+         </properties>
+      </profile>
+
+      <profile>
+         <id>harbour</id>
+         <activation>
+            <property>
+               <name>clp</name>
+               <value>harbour</value>
+            </property>
+         </activation>
+
+         <properties>
+            <arch>64</arch>
+            <clp-compiler>${hb-id}</clp-compiler>
+            <clp-version>${hb-version}</clp-version>
+            <clp-major-version>${hb-major-version}</clp-major-version>
+            <clp-group-id>${hb-group-id}</clp-group-id>
+            <clp-artifact-id>${hb-artifact-id}</clp-artifact-id>
+            <clp-lib-debug>${hb-lib-debug}</clp-lib-debug>
+            <clp-includes-path>${hb-includes-path}</clp-includes-path>
+            <clp-libs-path>${hb-libs-path}</clp-libs-path>
+            <clp-libs>${hb-libs}</clp-libs>
+            <clp-cmd>${hb-cmd}</clp-cmd>
+
+            <c-compiler>${msc-id}</c-compiler>
+            <cc-version>${msc-version}</cc-version>
+            <cc-major-version>${msc-major-version}</cc-major-version>
+            <cc-group-id>${msc-group-id}</cc-group-id>
+            <cc-artifact-id>${msc-artifact-id}</cc-artifact-id>
+            <cc-includes-path>${msc-includes-path}</cc-includes-path>
+            <cc-libs-path>${msc-libs-path}</cc-libs-path>
+            <cc-libs>${msc-libs}</cc-libs>
+            <cc-cmd>${msc-cmd}</cc-cmd>
+            <link-options>${msc-link-options}</link-options>
+            <link-cmd>${msc-link-cmd}</link-cmd>
+            <lib-cmd>${msc-lib-cmd}</lib-cmd>
+         </properties>
+      </profile>
+
+      <profile>
+         <id>bcc</id>
+
+         <activation>
+            <property>
+               <name>cc</name>
+               <value>bcc</value>
+            </property>
+         </activation>
+         <properties>
+            <arch>32</arch>
+            <c-compiler>${bcc-id}</c-compiler>
+            <cc-version>${bcc-version}</cc-version>
+            <cc-major-version>${bcc-major-version}</cc-major-version>
+            <cc-group-id>${bcc-group-id}</cc-group-id>
+            <cc-artifact-id>${bcc-artifact-id}</cc-artifact-id>
+            <cc-includes-path>${bcc-includes-path}</cc-includes-path>
+            <cc-libs-path>${bcc-libs-path}</cc-libs-path>
+            <cc-libs>${bcc-libs}</cc-libs>
+            <cc-cmd>${bcc-cmd}</cc-cmd>
+            <link-options>${bcc-link-options}</link-options>
+            <link-cmd>${bcc-link-cmd}</link-cmd>
+            <lib-cmd>${bcc-lib-cmd}</lib-cmd>
+         </properties>
+      </profile>
+
+      <profile>
+         <id>msc</id>
+
+         <activation>
+            <property>
+               <name>cc</name>
+               <value>msc</value>
+            </property>
+         </activation>
+
+         <properties>
+            <c-compiler>${msc-id}</c-compiler>
+            <cc-version>${msc-version}</cc-version>
+            <cc-major-version>${msc-major-version}</cc-major-version>
+            <cc-group-id>${msc-group-id}</cc-group-id>
+            <cc-artifact-id>${msc-artifact-id}</cc-artifact-id>
+            <cc-includes-path>${msc-includes-path}</cc-includes-path>
+            <cc-libs-path>${msc-libs-path}</cc-libs-path>
+            <cc-libs>${msc-libs}</cc-libs>
+            <cc-cmd>${msc-cmd}</cc-cmd>
+            <link-options>${msc-link-options}</link-options>
+            <link-cmd>${msc-link-cmd}</link-cmd>
+            <lib-cmd>${msc-lib-cmd}</lib-cmd>
+         </properties>
+      </profile>
+
+      <profile>
+         <id>mingw64</id>
+
+         <activation>
+            <property>
+               <name>cc</name>
+               <value>mingw64</value>
+            </property>
+         </activation>
+
+         <properties>
+            <cc-target>gcc</cc-target>
+            <c-compiler>${mingw64-id}</c-compiler>
+            <cc-version>${mingw64-version}</cc-version>
+            <cc-major-version>${mingw64-major-version}</cc-major-version>
+            <cc-group-id>${mingw64-group-id}</cc-group-id>
+            <cc-artifact-id>${mingw64-artifact-id}</cc-artifact-id>
+            <cc-includes-path>${mingw64-includes-path}</cc-includes-path>
+            <cc-libs-path>${mingw64-libs-path}</cc-libs-path>
+            <cc-libs>${mingw64-libs}</cc-libs>
+            <cc-cmd>${mingw64-cmd}</cc-cmd>
+            <link-options>${mingw64-link-options}</link-options>
+            <link-cmd>${mingw64-link-cmd}</link-cmd>
+            <lib-cmd>${mingw64-lib-cmd}</lib-cmd>
+            <lpref>lib</lpref>
+            <lext>a</lext>
+            <oext>o</oext>
+            <path-sep>/</path-sep>
+         </properties>
+      </profile>
+
+      <profile>
+         <id>clang</id>
+
+         <activation>
+            <property>
+               <name>cc</name>
+               <value>clang</value>
+            </property>
+         </activation>
+
+         <properties>
+            <cc-target>gcc</cc-target>
+            <c-compiler>${clang-id}</c-compiler>
+            <cc-version>${clang-version}</cc-version>
+            <cc-major-version>${clang-major-version}</cc-major-version>
+            <cc-group-id>${clang-group-id}</cc-group-id>
+            <cc-artifact-id>${clang-artifact-id}</cc-artifact-id>
+            <cc-includes-path>${clang-includes-path}</cc-includes-path>
+            <cc-libs-path>${clang-libs-path}</cc-libs-path>
+            <cc-libs>${clang-libs}</cc-libs>
+            <cc-cmd>${clang-cmd}</cc-cmd>
+            <link-options>${clang-link-options}</link-options>
+            <link-cmd>${clang-link-cmd}</link-cmd>
+            <lib-cmd>${clang-lib-cmd}</lib-cmd>
+            <lpref>lib</lpref>
+            <lext>a</lext>
+            <oext>o</oext>
+            <path-sep>/</path-sep>
+         </properties>
+      </profile>
+
+      <profile>
+         <id>com_debug</id>
+         <activation>
+            <property>
+               <name>debug</name>
+               <value>true</value>
+            </property>
+         </activation>
+         <properties>
+            <debug-lib>${clp-lib-debug}</debug-lib>
+         </properties>
+      </profile>
+
+      <profile>
+         <id>gcc</id>
+         <activation>
+            <os>
+               <family>unix</family>
+               <name>Linux</name>
+            </os>
+         </activation>
+         <properties>
+            <os>linux</os>
+            <cc-target>gcc</cc-target>
+            <c-compiler>${gcc-id}</c-compiler>
+            <cc-version>${gcc-version}</cc-version>
+            <cc-major-version>${gcc-major-version}</cc-major-version>
+            <cc-group-id>${gcc-group-id}</cc-group-id>
+            <cc-artifact-id>${gcc-artifact-id}</cc-artifact-id>
+            <cc-includes-path>${gcc-includes-path}</cc-includes-path>
+            <cc-libs-path>${gcc-libs-path}</cc-libs-path>
+            <cc-libs>${gcc-libs}</cc-libs>
+            <cc-cmd>${gcc-cmd}</cc-cmd>
+            <link-options>${gcc-link-options}</link-options>
+            <link-cmd>${gcc-link-cmd}</link-cmd>
+            <lib-cmd>${gcc-lib-cmd}</lib-cmd>
+            <clp-cmd>${hb-linux-cmd}</clp-cmd>
+            <lpref>lib</lpref>
+            <lext>a</lext>
+            <oext>o</oext>
+            <hb-gt-libs></hb-gt-libs>
+         </properties>
+      </profile>
+
+      <profile>
+         <id>win</id>
+         <activation>
+            <os>
+               <family>windows</family>
+            </os>
+         </activation>
+         <modules>
+            <module>sdb-lck-server-headers</module>
+            <module>sdb-lck-server-app</module>
+         </modules>
+         <dependencies>
+            <dependency>
+               <groupId>${cc-group-id}</groupId>
+               <artifactId>${cc-artifact-id}</artifactId>
+               <type>zip</type>
+               <version>${cc-version}</version>
+               <classifier>${target-platform}</classifier>
+            </dependency>
+         </dependencies>
+      </profile>
+
+      <profile>
+          <id>path_extract</id>
+          <activation>
+              <property>
+                 <name>env.BUILD_TEMP_PATH</name>
+              </property>
+          </activation>
+          <properties>
+              <extractDir>${env.BUILD_TEMP_PATH}</extractDir>
+          </properties>
+      </profile>
+
+   </profiles>
+
+</project>

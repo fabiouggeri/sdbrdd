@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <parent>
+      <groupId>org.sdb</groupId>
+      <artifactId>sdb-superpom</artifactId>
+      <version>1.5.0.1</version>
+   </parent>
+
+   <artifactId>sdb-lck-server-app</artifactId>
+   <packaging>exe</packaging>
+
+   <name>SDBRDD - App SDB Lock Server</name>
+
+   <url>http://maven.apache.org</url>
+
+   <dependencies>
+      <dependency>
+         <groupId>org.cfl</groupId>
+         <artifactId>cfl-headers</artifactId>
+         <version>${cfl-version}</version>
+         <type>include</type>
+         <scope>provided</scope>
+         <exclusions>
+            <exclusion>
+               <groupId>${cc-group-id}</groupId>
+               <artifactId>${cc-artifact-id}</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+      <dependency>
+         <groupId>org.sdb</groupId>
+         <artifactId>sdb-lck-server-headers</artifactId>
+         <version>${project.version}</version>
+         <type>include</type>
+         <scope>provided</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.cfl</groupId>
+         <artifactId>cfl-lib</artifactId>
+         <version>${cfl-version}</version>
+         <type>lib</type>
+         <classifier>${c-classifier}</classifier>
+         <exclusions>
+            <exclusion>
+               <groupId>${cc-group-id}</groupId>
+               <artifactId>${cc-artifact-id}</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+   </dependencies>
+
+   <profiles>
+      <profile>
+         <id>release</id>
+         <activation>
+            <property>
+               <name>release</name>
+            </property>
+         </activation>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-antrun-plugin</artifactId>
+                  <version>1.8</version>
+                  <inherited>false</inherited>
+                  <executions>
+                     <execution>
+                        <id>prepare-distribution</id>
+                        <phase>install</phase>
+                        <goals>
+                           <goal>run</goal>
+                        </goals>
+                        <configuration>
+                           <target name="Copy Exes">
+                              <copy file="target/classes/${prg-classifier}/sdb-lck-server-app-${project.version}-${prg-classifier}.exe" tofile="../distribution/${project.version}/${target-platform}/exes/${clp-compiler}/${clp-version}/${c-compiler}/${cc-version}/lock-server.exe" overwrite="true" />
+                           </target>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+   </profiles>
+</project>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <parent>
+      <groupId>org.sdb</groupId>
+      <artifactId>sdb-superpom</artifactId>
+      <version>1.5.0.1</version>
+   </parent>
+
+   <artifactId>sdb-rdd-lib</artifactId>
+   <packaging>lib</packaging>
+
+   <name>SDBRDD - Library RDD</name>
+
+   <url>http://maven.apache.org</url>
+
+   <dependencies>
+      <dependency>
+         <groupId>org.cfl</groupId>
+         <artifactId>cfl-headers</artifactId>
+         <version>${cfl-version}</version>
+         <type>include</type>
+         <scope>provided</scope>
+         <exclusions>
+            <exclusion>
+               <groupId>${cc-group-id}</groupId>
+               <artifactId>${cc-artifact-id}</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+      <dependency>
+         <groupId>org.sdb</groupId>
+         <artifactId>sdb-rdd-headers</artifactId>
+         <version>${project.version}</version>
+         <type>include</type>
+         <scope>provided</scope>
+      </dependency>
+      <dependency>
+         <groupId>br.com.uggeri.yapp</groupId>
+         <artifactId>yapp-c-runtime-headers</artifactId>
+         <version>${yapp-version}</version>
+         <type>include</type>
+         <scope>provided</scope>
+         <exclusions>
+            <exclusion>
+               <groupId>${cc-group-id}</groupId>
+               <artifactId>${cc-artifact-id}</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+   </dependencies>
+   <!-- <build>
+      <plugins>
+         <plugin>
+            <groupId>br.com.uggeri.yapp</groupId>
+            <artifactId>yapp-maven-plugin</artifactId>
+            <version>${yapp-version}</version>
+            <configuration>
+               <language>C</language>
+            </configuration>
+            <executions>
+              <execution>
+                <id>generate-parsers</id>
+                <goals>
+                  <goal>generate-parsers</goal>
+                </goals>
+              </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build> -->
+
+   <profiles>
+      <profile>
+         <id>release</id>
+         <activation>
+            <property>
+               <name>release</name>
+            </property>
+         </activation>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-antrun-plugin</artifactId>
+                  <version>1.8</version>
+                  <inherited>false</inherited>
+                  <executions>
+                     <execution>
+                        <id>prepare-distribution</id>
+                        <phase>install</phase>
+                        <goals>
+                           <goal>run</goal>
+                        </goals>
+                        <configuration>
+                           <target name="Copy Libs">
+                              <copy file="target/classes/${prg-classifier}/sdb-rdd-lib-${project.version}-${prg-classifier}.lib" tofile="../distribution/${project.version}/${target-platform}/libs/${clp-compiler}/${clp-version}/${c-compiler}/${cc-version}/${lpref}sdb-rdd.${lext}" overwrite="true" />
+                           </target>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+   </profiles>
+</project>

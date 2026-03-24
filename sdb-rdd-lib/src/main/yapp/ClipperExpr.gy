@@ -1,0 +1,274 @@
+grammar ClipperExpression;
+
+/*********************************************************************************
+                              RULES
+**********************************************************************************/
+ClipperExpression : Expression EOI;
+
+@Memoize
+@SkipNode
+Variable : VariablePattern OptionalSpacing;
+
+// @Atomic
+@Rule(Variable)
+VariablePattern : IdentifierPattern ('(' | '->')!;
+
+@SkipNode
+AssignmentOperator : AssignmentOperatorOnly OptionalSpacing;
+
+@Atomic
+@Rule(AssignmentOperator)
+AssignmentOperatorOnly : ':=' | EqualOperator;
+
+@Fragment
+EqualOperator : '=' ('>' | '=')!;
+
+ExpressionList : Expression? (',' Expression?)*;
+
+ParenthesesExpression : '(' ExpressionList ')';
+
+ParParameters : '(' OptionalParametersList ')';
+
+FunctionCall : AnyIdentifier ParParameters;
+
+IfInLine : ("iif" | "if") '(' Expression ',' Expression? ',' Expression? ')';
+
+@Fragment
+Letter : [a-z] | [A-Z];
+
+@Fragment
+Digit : [0-9];
+
+AliasedField : AnyIdentifier '->' AnyIdentifier;
+
+Parameter : Expression | ')'& | ','&;
+
+@SkipNode
+CommaParameter : ',' Parameter;
+
+@SkipNode
+ParameterCommaList : CommaParameter*;
+
+@SkipNode
+ParametersList : Parameter ParameterCommaList;
+
+@SkipNode
+OptionalParametersList : ParametersList?;
+
+@SkipNode
+LogicalLiteral : LogicalPattern OptionalSpacing;
+
+@Rule(LogicalLiteral)
+LogicalPattern : ".T."
+               | ".F."
+               | ".Y."
+               | ".N.";
+
+NilValue : "nil";
+
+@SkipNode
+Literal : StringLiteral
+        | NumberLiteral
+        | LogicalLiteral
+        | NilValue
+        | DateTimeLiteral;
+
+@SkipNode
+DateTimeLiteral : DateTimePattern OptionalSpacing;
+
+@Atomic
+@Rule(DateTimeLiteral)
+DateTimePattern : ("0D" Digit Digit Digit Digit Digit Digit Digit Digit) | 
+                  ("D" (('"' DatePattern ("T"? TimePattern)? '"') | ('\'' DatePattern ("T"? TimePattern)? '\'') | ('[' DatePattern ("T"? TimePattern)? ']'))) | 
+                  ('{' '^' (IntegerNumber ('-' | '/') IntegerNumber ('-' | '/') IntegerNumber ','?)? TimePattern? OptionalSpacing '}');
+
+@SkipNode
+TimeLiteral : TimePattern OptionalSpacing;
+
+@Atomic
+IntegerNumber : Digit+;
+
+@Atomic
+@Rule(TimeLiteral)
+TimePattern : IntegerNumber (':' IntegerNumber (':' IntegerNumber)? ('.' IntegerNumber)?)? ("AM" | "PM")?;
+
+@Atomic
+DatePattern : IntegerNumber ('-' | '/' | '.') IntegerNumber ('-' | '/' | '.') IntegerNumber;
+
+@SkipNode
+@Memoize
+Expression : OrExpression | OptionalAndExpression;
+
+OrExpression : OptionalAndExpression ".or." Expression;
+
+@SkipNode
+OptionalAndExpression : AndExpression | OptionalRelationalExpression;
+
+AndExpression : OptionalRelationalExpression ".and." OptionalAndExpression;
+
+@SkipNode
+RelationalOperator : RelationalOperatorOnly OptionalSpacing;
+
+@Atomic
+@Rule(RelationalOperator)
+RelationalOperatorOnly : '>='
+                       | '<='
+                       | '<>'
+                       | '#'
+                       | '!='
+                       | '>'
+                       | '<'
+                       | '=='
+                       | '$'
+                       | "in"
+                       | EqualOperator;
+
+@SkipNode
+OptionalRelationalExpression : RelationalExpression | OptionalMathExpression;
+
+@Memoize
+RelationalExpression : OptionalMathExpression RelationalOperator OptionalRelationalExpression;
+
+@SkipNode
+MathOperator : MathOperatorOnly OptionalSpacing;
+
+@Atomic
+@Rule(MathOperator)
+MathOperatorOnly : PlusSign
+                 | MinusSign
+                 | '**'
+                 | '*'
+                 | '/'
+                 | '%'
+                 | '^^'
+                 | '^'
+                 | '|'
+                 | '&';
+
+@SkipNode
+OptionalMathExpression : MathExpression | AtomicExpression;
+
+@Memoize
+MathExpression : AtomicExpression MathOperator OptionalMathExpression;
+
+@Fragment
+PlusSign : '+' '+'!;
+
+@Fragment
+MinusSign : '-' '-'!;
+
+@SkipNode
+@Memoize
+AtomicExpression : PrefixedExpression
+                 | AliasedField
+                 | Literal
+                 | IfInLine
+                 | FunctionCall
+                 | ParenthesesExpression
+                 | Variable;
+
+@Memoize
+PrefixedExpression : PrefixOperator Expression;
+
+@Fragment
+NotOperator : ( ".not."
+              | ('!' '='!) );
+
+@SkipNode
+PrefixOperator : PrefixOperatorOnly OptionalSpacing;
+
+@Atomic
+@Rule(PrefixOperator)
+PrefixOperatorOnly : NotOperator
+                   | PlusSign
+                   | MinusSign;
+
+@SkipNode
+StringLiteral : StringPattern OptionalSpacing;
+
+@Atomic
+@Rule(StringLiteral)
+StringPattern : ('"' (('\n' | '\"')! .)* '"')
+              | ('\'' (('\n' | '\'')! .)* '\'')
+              | ('[' (('\n' | ']')! .)* ']')
+              | ("e" '"' (('\\' '\n'! .) | (('\n' | '\"')! .))* '"');
+
+@SkipNode
+NumberLiteral : NumberPattern EndsNumber;
+
+@Fragment
+EndsNumber : ('?' | '&' | '_' | '~')* OptionalSpacing;
+
+@Atomic
+@Rule(NumberLiteral)
+NumberPattern : (IntegerNumber '.' IntegerNumber)
+              | (IntegerNumber '.' Letter!)
+              | IntegerNumber
+              | ('.' IntegerNumber);
+
+@SkipNode
+@Memoize
+AnyIdentifier : IdentifierPattern OptionalSpacing;
+
+@SkipNode
+@Memoize
+Identifier : Keyword! IdentifierPattern OptionalSpacing;
+
+@Rule(Identifier)
+@Atomic
+IdentifierPattern : ([A-Z] | [a-z] | '_') ([A-Z] | [a-z] | [0-9] | '_')*;
+
+@Atomic
+@SyntaxOnly
+Whitespace : (' ' | '\t' | '\f')+;
+
+@Atomic
+@SyntaxOnly
+LineComment : ('//' | '&&') (('\n' | '\r' | EOI)! .)*;
+
+@Atomic
+@SyntaxOnly
+BlockComment : '/*' ('*/'! .)* '*/';
+
+@Atomic
+@SyntaxOnly
+EndStmt : '\n'
+        | '\r\n'
+        | ';';
+
+@SyntaxOnly
+@NotExtendLiterals
+@Memoize
+Spacing : ( Whitespace
+          | LineComment
+          | BlockComment
+          | ContinueNL )+;
+
+@NotExtendLiterals
+ContinueNL : ';' (Whitespace | LineComment | BlockComment)* NewLine;
+
+@Fragment
+NewLine : '\n'
+        | '\r\n';
+
+@FollowLiterals([A-Za-z_][A-Za-z0-9_]*)
+@Fragment
+TestNoAlpha : ([a-z] | [A-Z] | [0-9] | '_')!;
+
+@SyntaxOnly
+@FollowLiterals
+@Memoize
+@Rule(Spacing)
+@IgnoreEmpty
+OptionalSpacing : ( Whitespace
+                  | LineComment
+                  | BlockComment
+                  | ContinueNL )*;
+
+@Fragment
+Keyword : ("announce":4 | "begin":4    | "break":4    | "case"        | "catch":4       | "default":4     | "each"        | "else"       |
+           "elseif"     | "end"        | "endcase":4  | "enddo":4     | "endif":4       | "endsequence":4 | "exit"        | "extern":4   |
+           "field":4    | "for"        | "function":4 | "in"          | "if"            | "iif"           | "init"        | "local":4    |
+           "loop"       | "memvar":4   | "next"       | "nil"         | "otherwise":4   | "parameters":4  | "procedure":4 | "public":4   |
+           "recover":4  | "return":4   | "self"       | "sequence":4  | "static":4      | "switch":4      | "try"         | "using":4    |
+           "while":4) TestNoAlpha;
