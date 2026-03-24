@@ -24,10 +24,6 @@
       <sdb-artifact-id>sdb-app</sdb-artifact-id>
       <builder-helper-version>2.4.0.0</builder-helper-version>
 
-		<artifactory.home>https://artifactory.sicredi.net/artifactory</artifactory.home>
-      <maven.repo.release.url>${artifactory.home}/libs-release-local</maven.repo.release.url>
-      <maven.repo.release.id>sicredi-release-repo</maven.repo.release.id>
-
       <cc>msc</cc>
       <cc-version>16.0.0.2</cc-version>
       <cc-major-version>16.x</cc-major-version>
